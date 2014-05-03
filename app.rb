@@ -41,6 +41,8 @@ get '/' do
 end
 
 get '/oauth/connect' do
+  puts "############"
+  puts "#{callback_url}"
   redirect Instagram.authorize_url(:redirect_uri => callback_url)
 end
 
