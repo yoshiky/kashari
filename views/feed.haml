@@ -1,0 +1,16 @@
+%h1 feed
+%p= @user.username + "'s recent posts"
+- @images.each do |image|
+  %img{:src=>image}
+%p
+  %a(href='/location_search')<
+    LOCATION SEARCH
+%p
+  %a(href='/location')<
+    LOCATION
+%form{action: "/subscription", method: :post}
+  %input{type: 'submit', value: '購読'}
+
+%form{action: "/subscription", method: :post}
+  %input{type: 'hidden', name: '_method', value: 'DELETE'}
+  %input{type: 'submit', value: '購読停止'}
