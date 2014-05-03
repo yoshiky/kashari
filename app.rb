@@ -41,8 +41,6 @@ get '/' do
 end
 
 get '/oauth/connect' do
-  puts "############"
-  puts "#{callback_url}"
   redirect Instagram.authorize_url(:redirect_uri => callback_url)
 end
 
@@ -117,11 +115,11 @@ end
 
 # Instagramからリアルタイム購読を受ける
 post '/subscription/callback' do
-  puts "####################"
-  puts "#{params[:body].inspect}"
+  puts "###request.body.read#################"
+  puts "#{request.body.read}"
   puts "####################"
 
-  Instagram.process_subscription(params[:body]) do |handler|
+  Instagram.process_subscription(request.body.read) do |handler|
     handler.on_geography_changed do |object_id|
       data = Instagram.geography_recent_media(object_id)
     end
