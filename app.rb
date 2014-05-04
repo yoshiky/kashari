@@ -115,8 +115,8 @@ end
 
 # Instagramからリアルタイム購読を受ける
 post '/subscription/callback' do
-  puts "###response.body.read#################"
-  puts "#{response.body.read}"
+  puts "###response.body#################"
+  puts "#{response.body}"
   puts "####################"
 
   Instagram.process_subscription(response.body.read) do |handler|
