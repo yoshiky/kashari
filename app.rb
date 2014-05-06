@@ -115,11 +115,6 @@ end
 
 # Instagramからリアルタイム購読を受ける
 post '/subscription/callback' do
-  puts "###request#################"
-  puts "#{request.body.read}"
-  puts "#{params[:body].inspect}"
-  puts "####################"
-
   Instagram.process_subscription(request.body.read) do |handler|
     handler.on_geography_changed do |object_id|
       data = Instagram.geography_recent_media(object_id)
