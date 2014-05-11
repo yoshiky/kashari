@@ -96,7 +96,7 @@ post '/subscription' do
   # Shibuya
   lat    = '35.657872'
   lng    = '139.70232'
-  radius = 1000 
+  radius = 5000 
   obj = client.create_subscription(:client_id     => Instagram.options['client_id'],
                                    :client_secret => Instagram.options['client_secret'],
                                    :object        => 'geography',
@@ -118,11 +118,10 @@ post '/subscription/callback' do
   Instagram.process_subscription(request.body.read) do |handler|
     handler.on_geography_changed do |object_id|
       data = Instagram.geography_recent_media(object_id)
+      puts "####################"
+      puts "#{data.inspect}"
     end
   end
-  puts "####################"
-  puts "#{data.inspect}"
-  puts "####################"
   200
 end
 
