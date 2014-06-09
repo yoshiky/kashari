@@ -148,6 +148,6 @@ end
 
 # view
 get '/' do
-  @photos = REDIS.lrange("photo_data", 17, 19)
+  @photos = REDIS.lrange("photo_data", 0, 19)
   haml :index
 end
