@@ -21,6 +21,7 @@ GEM
       rack
     rack-test (0.6.2)
       rack (>= 1.0)
+    redis (3.0.7)
     shotgun (0.9)
       rack (>= 1.0)
     sinatra (1.4.5)
@@ -42,6 +43,7 @@ PLATFORMS
 DEPENDENCIES
   haml
   instagram
+  redis
   shotgun
   sinatra
   sinatra-contrib

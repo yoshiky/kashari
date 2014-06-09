@@ -1,11 +1,15 @@
 require 'rubygems'
 require 'sinatra'
 require 'sinatra/reloader' if development?
+require 'sinatra/content_for'
 require 'instagram'
 require 'yaml'
 require 'haml'
+require 'json'
+require 'redis'
 
 enable :sessions
+set :session_secret, 'tripwindow'
 
 configure :development do
   config = YAML::load_file('config.yml')
@@ -13,6 +17,7 @@ configure :development do
     conf.client_id     = config['instagram']['client_id']
     conf.client_secret = config['instagram']['client_secret']
   end
+  REDIS = Redis.new
 end
 
 configure :production do
@@ -20,6 +25,8 @@ configure :production do
     conf.client_id     = ENV['INSTAGRAM_CLIENT_ID']
     conf.client_secret = ENV['INSTAGRAM_CLIENT_SECRET']
   end
+  uri = URI.parse(ENV['REDISTOGO_URL'])
+  REDIS = Redis.new(:host => uri.host, :port => uri.port, :password => uri.password)
 end
 
 helpers do
@@ -34,10 +41,6 @@ helpers do
   def subscript_url
     base_url + '/subscription/callback'
   end
-end
-
-get '/' do
-  haml :index
 end
 
 get '/oauth/connect' do
@@ -94,9 +97,9 @@ post '/subscription' do
   client = Instagram.client(:access_token => session[:access_token])
   
   # Shibuya
-  lat    = '35.657872'
-  lng    = '139.70232'
-  radius = 5000 
+  lat    = '35.659084'
+  lng    = '139.701017'
+  radius = 1000 
   obj = client.create_subscription(:client_id     => Instagram.options['client_id'],
                                    :client_secret => Instagram.options['client_secret'],
                                    :object        => 'geography',
@@ -117,9 +120,19 @@ end
 post '/subscription/callback' do
   Instagram.process_subscription(request.body.read) do |handler|
     handler.on_geography_changed do |object_id|
-      data = Instagram.geography_recent_media(object_id)
-      puts "####################"
-      puts "#{data.inspect}"
+      photos = Instagram.geography_recent_media(object_id, :count => 10)
+
+      photos.each do |photo|
+        text = photo.caption.nil? ? "" : photo.caption.text
+        photo_data = {:id => photo.id,
+                      :url => photo.images.standard_resolution.url,
+                      :text => text,
+                      :link => photo.link,
+                      :created_time => photo.created_time}
+        REDIS.lpush("photo_data", photo_data.to_json)
+      end
+      # 最新10件だけにする
+      #REDIS.ltrim "photo_data", 0, 9
     end
   end
   200
@@ -131,4 +144,10 @@ delete '/subscription' do
   client.delete_subscription(:object=>"all")
   200
   redirect '/'
+end
+
+# view
+get '/' do
+  @photos = REDIS.lrange("photo_data", 17, 19)
+  haml :index
 end

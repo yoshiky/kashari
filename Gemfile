@@ -5,4 +5,5 @@ gem 'sinatra'
 gem 'sinatra-contrib'
 gem 'instagram'
 gem 'haml'
-gem "shotgun"
+gem 'shotgun'
+gem 'redis'
