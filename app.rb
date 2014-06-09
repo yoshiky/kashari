@@ -131,8 +131,8 @@ post '/subscription/callback' do
                       :created_time => photo.created_time}
         REDIS.lpush("photo_data", photo_data.to_json)
       end
-      # 最新10件だけにする
-      #REDIS.ltrim "photo_data", 0, 9
+      # 最新20件だけにする
+      REDIS.ltrim "photo_data", 0, 19
     end
   end
   200
