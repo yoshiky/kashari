@@ -97,7 +97,7 @@ end
 post '/subscription/callback' do
   Instagram.process_subscription(request.body.read) do |handler|
     handler.on_geography_changed do |object_id|
-      photos = Instagram.geography_recent_media(object_id, :count => 10)
+      photos = Instagram.geography_recent_media(object_id, :count => 20)
 
       photos.each do |photo|
         text = photo.caption.nil? ? "" : photo.caption.text
@@ -108,7 +108,6 @@ post '/subscription/callback' do
                       :created_time => photo.created_time}
         REDIS.lpush("photo_data", photo_data.to_json)
       end
-      # 最新20件だけにする
       REDIS.ltrim "photo_data", 0, 19
     end
   end
