@@ -1,13 +1,11 @@
-%h1 feed
-%p= @user.username + "'s recent posts"
-- @images.each do |image|
-  %img{:src=>image}
-%p
-  %a(href='/location_search')<
-    LOCATION SEARCH
-%p
-  %a(href='/location')<
-    LOCATION
+%h1 ADMIN
+- unless @user.nil?
+  %p= @user.username + "'s recent posts"
+
+- unless @images.nil?
+  - @images.each do |image|
+    %img{:src=>image}
+
 %form{action: "/subscription", method: :post}
   %input{type: 'submit', value: '購読'}
 

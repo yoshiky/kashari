@@ -1,21 +1,21 @@
-require 'rubygems'
-require 'sinatra'
-require 'sinatra/reloader' if development?
-require 'sinatra/content_for'
-require 'instagram'
-require 'yaml'
-require 'haml'
-require 'json'
-require 'redis'
+#require 'rubygems'
+#require 'sinatra'
+#require 'sinatra/reloader' if development?
+#require 'sinatra/content_for'
+#require 'instagram'
+#require 'yaml'
+#require 'haml'
+#require 'json'
+#require 'redis'
 
-enable :sessions
+enable :sessions 
 set :session_secret, 'tripwindow'
+CONFIG = YAML::load_file('config.yml')
 
 configure :development do
-  config = YAML::load_file('config.yml')
   Instagram.configure do |conf|
-    conf.client_id     = config['instagram']['client_id']
-    conf.client_secret = config['instagram']['client_secret']
+    conf.client_id     = CONFIG['instagram']['client_id']
+    conf.client_secret = CONFIG['instagram']['client_secret']
   end
   REDIS = Redis.new
 end
@@ -43,6 +43,10 @@ helpers do
   end
 end
 
+get '/admin' do
+  redirect '/oauth/connect'
+end
+
 get '/oauth/connect' do
   redirect Instagram.authorize_url(:redirect_uri => callback_url)
 end
@@ -53,6 +57,79 @@ get '/oauth/callback' do
   redirect '/feed'
 end
 
+# 購読リクエスト
+# Command of Create a Subscription
+#
+# curl -F 'client_id=CLIENT-ID' \
+#      -F 'client_secret=CLIENT-SECRET' \
+#      -F 'object=geography' \
+#      -F 'aspect=media' \
+#      -F 'lat=35.659084' \
+#      -F 'lng=139.701017' \
+#      -F 'radius=1000' \
+#      -F 'callback_url=http://tripwindow.herokuapp.com/subscription/callback' \
+#      https://api.instagram.com/v1/subscriptions/
+#
+post '/subscription' do
+  client = Instagram.client(:access_token => session[:access_token])
+  
+  # Shibuya
+  lat    = '35.659084'
+  lng    = '139.701017'
+  radius = 1000 
+  obj = client.create_subscription(:client_id     => Instagram.options['client_id'],
+                                   :client_secret => Instagram.options['client_secret'],
+                                   :object        => 'geography',
+                                   :aspect        => 'media',
+                                   :lat           => lat,
+                                   :lng           => lng,
+                                   :radius        => radius,
+                                   :callback_url  => subscript_url)
+  obj
+end
+
+# Instagramからのcallback先
+get '/subscription/callback' do
+  params[:'hub.challenge']
+end
+
+# Instagramからリアルタイム購読を受ける
+post '/subscription/callback' do
+  Instagram.process_subscription(request.body.read) do |handler|
+    handler.on_geography_changed do |object_id|
+      photos = Instagram.geography_recent_media(object_id, :count => 10)
+
+      photos.each do |photo|
+        text = photo.caption.nil? ? "" : photo.caption.text
+        photo_data = {:id => photo.id,
+                      :url => photo.images.low_resolution.url,
+                      :text => text,
+                      :link => photo.link,
+                      :created_time => photo.created_time}
+        REDIS.lpush("photo_data", photo_data.to_json)
+      end
+      # 最新20件だけにする
+      REDIS.ltrim "photo_data", 0, 19
+    end
+  end
+  200
+end
+
+# 購読停止
+delete '/subscription' do
+  client = Instagram.client(:access_token => session[:access_token])
+  client.delete_subscription(:object=>"all")
+  200
+  redirect '/'
+end
+
+# view
+get '/' do
+  @photos = REDIS.lrange("photo_data", 0, 19)
+  haml :index
+end
+
+# TODO 消す or 何かに再利用
 get '/feed' do
   client = Instagram.client(:access_token => session[:access_token])
   @user = client.user
@@ -92,62 +169,8 @@ get '/location' do
   html
 end
 
-# 購読リクエスト
-post '/subscription' do
-  client = Instagram.client(:access_token => session[:access_token])
-  
-  # Shibuya
-  lat    = '35.659084'
-  lng    = '139.701017'
-  radius = 1000 
-  obj = client.create_subscription(:client_id     => Instagram.options['client_id'],
-                                   :client_secret => Instagram.options['client_secret'],
-                                   :object        => 'geography',
-                                   :aspect        => 'media',
-                                   :lat           => lat,
-                                   :lng           => lng,
-                                   :radius        => radius,
-                                   :callback_url  => subscript_url)
-  obj
-end
-
-# Instagramからのcallback先
-get '/subscription/callback' do
-  params[:'hub.challenge']
-end
-
-# Instagramからリアルタイム購読を受ける
-post '/subscription/callback' do
-  Instagram.process_subscription(request.body.read) do |handler|
-    handler.on_geography_changed do |object_id|
-      photos = Instagram.geography_recent_media(object_id, :count => 10)
-
-      photos.each do |photo|
-        text = photo.caption.nil? ? "" : photo.caption.text
-        photo_data = {:id => photo.id,
-                      :url => photo.images.standard_resolution.url,
-                      :text => text,
-                      :link => photo.link,
-                      :created_time => photo.created_time}
-        REDIS.lpush("photo_data", photo_data.to_json)
-      end
-      # 最新20件だけにする
-      REDIS.ltrim "photo_data", 0, 19
-    end
-  end
-  200
-end
-
-# 購読停止
-delete '/subscription' do
-  client = Instagram.client(:access_token => session[:access_token])
-  client.delete_subscription(:object=>"all")
-  200
-  redirect '/'
-end
-
-# view
-get '/' do
-  @photos = REDIS.lrange("photo_data", 0, 19)
-  haml :index
+get '/test' do
+  num = rand(3)
+  puts lat = CONFIG['geography'][num]['lat']
+  puts lng = CONFIG['geography'][num]['lng']
 end

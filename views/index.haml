@@ -1,4 +1,9 @@
+%div#title
+  %h1
+    Daily Landspaces
 %div#main
+  %section
+
   :javascript
     var photos = #{@photos}
     var $ul = $('<ul></ul>');
@@ -6,24 +11,5 @@
       var data = JSON.parse(value);
       $ul.append('<li><a href=' + data.link + ' target="_blank" alt="Instagram Pic"><img src=' + data.url + '><span>' + data.text + '</span></a></li>');
     });
-    $('body').append($ul);
+    $('section').append($ul);
 
-  :css
-    li { 
-      position: relative;
-      list-style: none;
-      padding: 0 0 10px 0;
-    }
-    li span {
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      margin: 0 0 10px 0;
-      padding: 10px;
-      max-width: 450px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      color: white;
-      background-color: rgba(0, 0, 0, 0.65);
-    }
