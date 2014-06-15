@@ -1,12 +1,12 @@
-require 'rubygems'
-require 'sinatra'
-require 'sinatra/reloader' if development?
-require 'sinatra/content_for'
-require 'instagram'
-require 'yaml'
-require 'haml'
+#require 'rubygems'
+#require 'sinatra'
+#require 'sinatra/reloader' if development?
+#require 'sinatra/content_for'
+#require 'instagram'
+#require 'haml'
+#require 'redis'
 require 'json'
-require 'redis'
+require 'yaml'
 
 enable :sessions 
 set :session_secret, 'tripwindow'
