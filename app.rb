@@ -10,7 +10,7 @@ require 'redis'
 
 enable :sessions 
 set :session_secret, 'tripwindow'
-CONFIG = YAML::load_file('config.yml')
+CONFIG = YAML::load_file('config.yml') if development?
 
 configure :development do
   Instagram.configure do |conf|
