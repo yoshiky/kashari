@@ -103,7 +103,7 @@ post '/subscription/callback' do
         REDIS.zadd("sorted_photos", photo.id.split("_")[0], photo_data.to_json)
       end
       #REDIS.ltrim "photo_data", 0, 19
-      REDIS.zremrangebyrank "sorted_photos", 100, -1
+      REDIS.zremrangebyrank "sorted_photos", 0, 99
     end
   end
   200
