@@ -1,10 +1,4 @@
-#require 'rubygems'
-#require 'sinatra'
-#require 'sinatra/reloader' if development?
-#require 'sinatra/content_for'
-#require 'instagram'
-#require 'haml'
-#require 'redis'
+require 'sinatra/reloader' if development?
 require 'json'
 require 'yaml'
 
@@ -58,8 +52,8 @@ get '/oauth/callback' do
 end
 
 # 購読リクエスト
-# Command of Create a Subscription
-#
+# Command to Create a Subscription
+# ex)
 # curl -F 'client_id=CLIENT-ID' \
 #      -F 'client_secret=CLIENT-SECRET' \
 #      -F 'object=geography' \
@@ -97,8 +91,7 @@ end
 post '/subscription/callback' do
   Instagram.process_subscription(request.body.read) do |handler|
     handler.on_geography_changed do |object_id|
-      photos = Instagram.geography_recent_media(object_id, :count => 20)
-
+      photos = Instagram.geography_recent_media(object_id)
       photos.each do |photo|
         text = photo.caption.nil? ? "" : photo.caption.text
         photo_data = {:id => photo.id,
@@ -106,9 +99,11 @@ post '/subscription/callback' do
                       :text => text,
                       :link => photo.link,
                       :created_time => photo.created_time}
-        REDIS.lpush("photo_data", photo_data.to_json)
+        #REDIS.lpush("photo_data", photo_data.to_json)
+        REDIS.zadd("sorted_photos", photo.id.split("_")[0], photo_data.to_json)
       end
-      REDIS.ltrim "photo_data", 0, 19
+      #REDIS.ltrim "photo_data", 0, 19
+      REDIS.zremrangebyrank "sorted_photos", 100, -1
     end
   end
   200
@@ -124,7 +119,8 @@ end
 
 # view
 get '/' do
-  @photos = REDIS.lrange("photo_data", 0, 19)
+  #@photos = REDIS.lrange("photo_data", 0, 19)
+  @photos = REDIS.zrevrange("sorted_photos", 0, 99)
   haml :index
 end
 
