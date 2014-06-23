@@ -1,6 +1,4 @@
 @charset "utf-8";
-/* reset */
-*{margin: 0; padding: 0}
 
 /* mobile --undler 480px */
 #title{
@@ -43,5 +41,6 @@ span {
   background-color: rgba(0, 0, 0, 0.65);
 }
 img {
-  background: url("../img/space.gif") 306px;
+  width: 306px;
+  height:306px;
 }

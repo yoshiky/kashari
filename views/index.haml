@@ -9,7 +9,13 @@
     var $ul = $('<ul></ul>');
     $.each(photos, function(key, value){
       var data = JSON.parse(value);
-      $ul.append('<li><a href=' + data.link + ' target="_blank" alt="Instagram Pic"><img src=' + data.url + '><span>' + data.text + '</span></a></li>');
+      $ul.append('<li><a href=' + data.link + ' target="_blank" alt="Instagram Pic"><img data-original=' + data.url + '><span>' + data.text + '</span></a></li>');
     });
     $('section').append($ul);
+
+    // LazyLoad
+    $('img').lazyload({
+      effect: "fadeIn",
+      effectspeed: 2000,
+    });
 
