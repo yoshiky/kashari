@@ -2,6 +2,10 @@
   %h1
     Daily Landspaces
 %div#main
+  %div.backtotop
+    %a(href="#main" align="center")<
+      TOP
+
   %section
 
   :javascript
@@ -17,5 +21,22 @@
     $('img').lazyload({
       effect: "fadeIn",
       effectspeed: 2000,
+    });
+
+    // PageScroll
+    var topBtn = $('.backtotop');
+    topBtn.hide();
+    $(window).scroll(function(){
+      if ($(this).scrollTop() > 100){
+        topBtn.fadeIn();
+      }else{
+        topBtn.fadeOut();
+      }
+    });
+    topBtn.click(function(){
+      $('body, html').animate({
+        scrollTop: 0
+      , },500);
+      return false;
     });
 

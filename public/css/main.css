@@ -44,3 +44,27 @@ img {
   width: 306px;
   height:306px;
 }
+
+/* ページスクロール
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^*/
+.backtotop {
+  position: fixed;
+  right: 15px;
+  bottom: 10px;
+  z-index: 999;
+  opacity: 0.7;
+}
+.backtotop a{
+  display: block;
+  color: #777777;
+  padding: 15px 10px;
+  margin: 0px;
+  background-color: #DDDDDD;
+  border-radius: 5px;
+  text-decoration: none;
+  outline: none;
+}
+.backtotop a:hover{
+  background-color: #666666;
+  color: #FFFFFF;
+}
