@@ -4,7 +4,7 @@ Instagram APIが提供している地域情報をもとに、geography subscript
 
 URL: http://kashari.herokuapp.com
 
-- サービス名変更に伴い、変えるかも。。-
+-サービス名変更に伴い、変えるかも。。-
 
 ※2014年7月7日 tripwindow から kashari に変更。
 
