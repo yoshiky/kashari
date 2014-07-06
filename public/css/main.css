@@ -1,21 +1,18 @@
 @charset "utf-8";
 
-/* mobile --undler 480px */
-#title{
-  position: fixed;
-  z-index: 999;
-  top: 0;
-  left: 0;
-  width: 100%;
-  text-align: center;
-  vertical-align: center;
-  margin-bottom: 10px;
-  padding: 10px 0;
-  background: -ms-gradient(white, rgba(180, 180, 100, 0.65));
-  background: -moz-linear-gradient(white, rgba(180, 180, 100, 0.65));
-  background: -webkit-gradient(linear, left top, left bottom, from(white), to(rgba(180, 180, 100, 0.65))); 
-  background: linear-gradient(white, rgba(180, 180, 100, 0.65));
+html{
+  font-family: sans-serif;
 }
+
+#title{
+  text-align: center;
+  margin: 50px 0;
+}
+h1{
+  font-size: 40px;
+  font-style: italic;
+}
+
 section{
   display: inline-block;
   text-align: center;

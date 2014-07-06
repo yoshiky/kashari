@@ -1,13 +1,17 @@
 !!! 5
 %html
   %head
-    %title= "Trip Window"
+    %title= "Kashari | 「今」のカシャリ！"
     %meta{:charset => "utf-8"}
-    %meta{ 'http-equiv' => 'Content-Script-Type', :content => 'text/javascript'}
     %meta{:name=>"viewport", :content=>"width=device-width"}
+    %meta{:property => "og:type", :content=>"website"}
+    %meta{:property => "og:image", :content=>""}
+    %meta{:property => "og:url", :content=>"http://kashari.herokuapp.com"}
+    %meta{:property => "og:description", :content=>"Instagramからのリアルタイムな「カシャリ」"}
     %script{:src => "//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"}
     %script{:src => "js/jquery.lazyload.min.js"}
     %link{:rel => 'stylesheet', :href => 'css/reset.css', :type => 'text/css'}
     %link{:rel => 'stylesheet', :href => 'css/main.css', :type => 'text/css'}
+    %link{:rel => 'shortcut icon', :href => './favicon.ico'}
   %body
     = yield

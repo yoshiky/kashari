@@ -99,10 +99,8 @@ post '/subscription/callback' do
                       :text => text,
                       :link => photo.link,
                       :created_time => photo.created_time}
-        #REDIS.lpush("photo_data", photo_data.to_json)
         REDIS.zadd("sorted_photos", photo.id.split("_")[0], photo_data.to_json)
       end
-      #REDIS.ltrim "photo_data", 0, 19
       REDIS.zremrangebyrank("sorted_photos", 0, -101)
     end
   end
